@@ -1,0 +1,40 @@
+name: Commit MAX v2 APK
+
+on:
+  push:
+    paths:
+      - '.github/workflows/commit-max-v2-apk.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  build-commit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Checkout MAX v2 source
+        uses: actions/checkout@v4
+        with:
+          repository: jjjjjjjjjjjjjjae-hub/my-own-rp-project
+          path: source
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.10.2'
+      - name: Build APK
+        run: gradle -p source/almas-net-max :app:assembleDebug --no-daemon
+      - name: Commit APK
+        run: |
+          cp source/almas-net-max/app/build/outputs/apk/debug/app-debug.apk Almas-Net-Optimizer-MAX-v2.apk
+          rm -rf source
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add Almas-Net-Optimizer-MAX-v2.apk
+          git commit -m "Add Almas Net Optimizer MAX v2 APK [skip ci]" || exit 0
+          git push
