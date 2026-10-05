@@ -1,0 +1,30 @@
+name: Build MAX v2 for Chat
+
+on:
+  push:
+    paths:
+      - '.github/workflows/build-max-v2-transfer.yml'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout MAX v2 source
+        uses: actions/checkout@v4
+        with:
+          repository: jjjjjjjjjjjjjjae-hub/my-own-rp-project
+          path: source
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.10.2'
+      - name: Build APK
+        run: gradle -p source/almas-net-max :app:assembleDebug --no-daemon
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Almas-Net-Optimizer-MAX-v2-chat
+          path: source/almas-net-max/app/build/outputs/apk/debug/app-debug.apk
