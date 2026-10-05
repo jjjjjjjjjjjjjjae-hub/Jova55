@@ -1,0 +1,37 @@
+name: Release Almas Net MAX v2
+
+on:
+  push:
+    paths:
+      - '.github/workflows/release-max-v2.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout MAX v2 source
+        uses: actions/checkout@v4
+        with:
+          repository: jjjjjjjjjjjjjjae-hub/my-own-rp-project
+          path: source
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.10.2'
+      - name: Build APK
+        run: gradle -p source/almas-net-max :app:assembleDebug --no-daemon
+      - name: Prepare APK
+        run: cp source/almas-net-max/app/build/outputs/apk/debug/app-debug.apk Almas-Net-Optimizer-MAX-v2.apk
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release delete netmax-v2 --repo ${{ github.repository }} --yes || true
+          git push origin :refs/tags/netmax-v2 || true
+          gh release create netmax-v2 Almas-Net-Optimizer-MAX-v2.apk --repo ${{ github.repository }} --title "Almas Net Optimizer MAX v2" --notes "MAX APN AUTO build"
